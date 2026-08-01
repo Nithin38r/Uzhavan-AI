@@ -231,47 +231,55 @@
 
   /* Desktop/laptop: ~1024px and up — sidebar nav instead of bottom tabs */
   @media (min-width: 1024px){
-    body{ padding:40px 16px; }
+    body{ padding:0; }
     .phone{
-      max-width:880px; flex-direction:column; border-radius:24px;
+      max-width:none; width:100%; flex-direction:column;
+      border-radius:0; box-shadow:none; /* no more "card floating on a background" look */
     }
     /* topbar stays full-width across the top as normal, with a fixed
        height so the sidebar below can line up exactly against it */
-    .topbar{ min-height:90px; }
+    .topbar{ min-height:90px; padding-left:48px; padding-right:48px; }
 
     /* the scrolling content + nav become a side-by-side row below the topbar */
     .screens{
-      padding-bottom:0; padding-left:132px; /* room for the sidebar */
-      min-height:600px;
+      padding-bottom:0; padding-left:180px; /* room for the sidebar */
+      min-height:calc(100vh - 90px);
     }
-    .screen{ padding:32px 40px 40px; max-width:640px; }
+    /* inner content still caps its width so text doesn't stretch edge-to-edge
+       and become unreadable on an ultra-wide monitor — the BACKGROUND goes
+       full-bleed, the TEXT stays a comfortable reading width */
+    .screen{ padding:40px 48px 48px; max-width:760px; margin:0 auto 0 0; }
 
     .bottomnav{
       position:absolute; top:90px; bottom:0; left:0; right:auto;
-      width:116px; flex-direction:column; justify-content:flex-start;
-      gap:8px; padding:20px 10px; border-top:none; border-right:1px solid var(--line);
+      width:164px; flex-direction:column; justify-content:flex-start;
+      gap:10px; padding:28px 14px; border-top:none; border-right:1px solid var(--line);
     }
-    .navbtn{ flex:none; padding:12px 6px; }
-    .navbtn .ic{ font-size:22px; }
+    .navbtn{ flex:none; padding:14px 8px; }
+    .navbtn .ic{ font-size:24px; }
 
     /* let card lists use the extra width instead of a single narrow column */
-    .district-list, #districtList{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .district-list, #districtList{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     .district-card{ margin-bottom:0; }
-    #historyList{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    #historyList{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .hist-item{ margin-bottom:0; }
   }
 
-  /* Large desktop: ~1400px and up — a bit more breathing room, not endless stretching */
+  /* Large desktop: ~1400px and up — sidebar and content scale up a bit
+     further, but content still caps out at a readable width */
   @media (min-width: 1400px){
-    .phone{ max-width:1040px; }
-    .screen{ max-width:760px; }
+    .topbar{ padding-left:64px; padding-right:64px; }
+    .screens{ padding-left:220px; }
+    .screen{ max-width:860px; padding:48px 56px 56px; }
+    .bottomnav{ width:200px; padding:36px 18px; }
+    .district-list, #districtList{ grid-template-columns:1fr 1fr 1fr; }
   }
 </style>
 </head>
 <body>
 <div id="splashScreen">
   <div class="splash-mark">
-    <img src="logo.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿'}))">
+    <img src="img/logo.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿'}))">
   </div>
   <div class="splash-name">Uzhavan AI</div>
   <div class="splash-sub" id="splashSub">Loading…</div>
@@ -280,12 +288,13 @@
 
   <div class="topbar">
     <div class="brand">
-      <!-- LOGO: put a file named "logo.png" in the same folder as this HTML
-           file to use your own logo. If logo.png isn't found (e.g. you
-           haven't added one yet), it automatically falls back to the leaf
-           emoji below so the header never looks broken. Any image format
-           works — just update the src path if you name the file differently. -->
-      <div class="mark"><img src="logo.png" alt="Uzhavan AI logo" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿'}))"></div>
+      <!-- LOGO: put a file named "logo.png" inside an "img" subfolder next
+           to this HTML file (path: img/logo.png) to use your own logo.
+           If it isn't found (e.g. you haven't added one yet), it
+           automatically falls back to the leaf emoji below so the header
+           never looks broken. Any image format works — just update the
+           src path if you name the file or folder differently. -->
+      <div class="mark"><img src="img/logo.png" alt="Uzhavan AI logo" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿'}))"></div>
       <div class="name">Uzhavan AI</div>
     </div>
     <div class="topbar-controls">

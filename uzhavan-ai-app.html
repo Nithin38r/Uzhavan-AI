@@ -34,25 +34,25 @@
   body{margin:0;background:#EFE7D3;font-family:var(--font-body);color:var(--ink);
     display:flex;justify-content:center;min-height:100vh;}
   .phone{
-    width:420px; max-width:100vw; min-height:100vh; background:var(--cream);
+    width:100%; max-width:420px; min-height:100vh; background:var(--cream);
     position:relative; overflow:hidden; box-shadow:0 0 60px rgba(0,0,0,.25);
     display:flex; flex-direction:column;
   }
   /* ---- top bar ---- */
   .topbar{
-    background:var(--leaf-dark); color:var(--paper); padding:14px 18px 16px;
+    background:var(--leaf-dark); color:var(--paper); padding:18px 18px 20px;
     display:flex; align-items:center; justify-content:space-between;
   }
-  .brand{display:flex; align-items:center; gap:8px;}
+  .brand{display:flex; align-items:center; gap:12px;}
   .brand .mark{
-    width:30px; height:30px; border-radius:8px; background:var(--turmeric);
-    display:flex; align-items:center; justify-content:center; font-size:16px;
-    overflow:hidden;
+    width:52px; height:52px; border-radius:50%; background:var(--turmeric);
+    display:flex; align-items:center; justify-content:center; font-size:26px;
+    overflow:hidden; flex-shrink:0; border:2px solid rgba(255,255,255,.35);
   }
   .brand .mark img{
-    width:100%; height:100%; object-fit:cover; display:block;
+    width:100%; height:100%; object-fit:cover; display:block; border-radius:50%;
   }
-  .brand .name{font-family:var(--font-display); font-weight:700; font-size:20px; letter-spacing:.3px;}
+  .brand .name{font-family:var(--font-display); font-weight:700; font-size:23px; letter-spacing:.3px;}
   .topbar-controls{display:flex; align-items:center; gap:10px;}
   .lang-select{
     background:rgba(255,255,255,.12); color:var(--paper); border:1px solid rgba(255,255,255,.25);
@@ -178,9 +178,104 @@
   .navbtn .ic{font-size:18px;}
 
   ::-webkit-scrollbar{width:0;}
+
+  /* ---- splash / loading screen ---- */
+  #splashScreen{
+    position:fixed; inset:0; background:#ffffff; z-index:9999;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:16px; transition:opacity .5s ease;
+  }
+  #splashScreen.hide{ opacity:0; pointer-events:none; }
+  #splashScreen .splash-mark{
+    width:88px; height:88px; border-radius:50%; background:var(--turmeric);
+    display:flex; align-items:center; justify-content:center; font-size:42px;
+    overflow:hidden; border:2px solid var(--line);
+    /* two breaths, each with a hold before the next: scale up, back down,
+       pause, then repeat once more — animation-iteration-count:2 replays
+       this whole in-out-pause cycle a second time. */
+    animation: splashBreathe 2.6s ease-in-out 2;
+  }
+  #splashScreen .splash-mark img{
+    width:100%; height:100%; object-fit:cover; display:block; border-radius:50%;
+  }
+  #splashScreen .splash-name{
+    font-family:var(--font-display); font-weight:700; font-size:22px; color:var(--leaf-dark);
+  }
+  #splashScreen .splash-sub{
+    font-size:12.5px; color:var(--ink-soft);
+  }
+  @keyframes splashBreathe{
+    0%   { transform:scale(1); }
+    25%  { transform:scale(1.18); }
+    50%  { transform:scale(1); }
+    100% { transform:scale(1); }   /* holds still for the rest of the cycle = the pause before the next breath */
+  }
+  /* ======================================================================
+     RESPONSIVE — mobile stays exactly as designed above (this is a
+     mobile-first app). Tablet gets a comfortably wider card. Desktop/
+     laptop switches the bottom tab bar into a left sidebar instead of
+     just stretching a phone-shaped card across a huge screen — a real
+     layout "switch" rather than the same mobile view just scaled up.
+     ====================================================================== */
+
+  /* Tablet: ~640px and up — wider centered card, roomier padding */
+  @media (min-width: 640px){
+    body{ padding:32px 16px; align-items:flex-start; }
+    .phone{
+      max-width:560px; min-height:auto; margin-top:8px;
+      border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,.18);
+    }
+    .screen{ padding:24px 28px 32px; }
+    .scan-ring{ width:220px; height:220px; }
+  }
+
+  /* Desktop/laptop: ~1024px and up — sidebar nav instead of bottom tabs */
+  @media (min-width: 1024px){
+    body{ padding:40px 16px; }
+    .phone{
+      max-width:880px; flex-direction:column; border-radius:24px;
+    }
+    /* topbar stays full-width across the top as normal, with a fixed
+       height so the sidebar below can line up exactly against it */
+    .topbar{ min-height:90px; }
+
+    /* the scrolling content + nav become a side-by-side row below the topbar */
+    .screens{
+      padding-bottom:0; padding-left:132px; /* room for the sidebar */
+      min-height:600px;
+    }
+    .screen{ padding:32px 40px 40px; max-width:640px; }
+
+    .bottomnav{
+      position:absolute; top:90px; bottom:0; left:0; right:auto;
+      width:116px; flex-direction:column; justify-content:flex-start;
+      gap:8px; padding:20px 10px; border-top:none; border-right:1px solid var(--line);
+    }
+    .navbtn{ flex:none; padding:12px 6px; }
+    .navbtn .ic{ font-size:22px; }
+
+    /* let card lists use the extra width instead of a single narrow column */
+    .district-list, #districtList{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .district-card{ margin-bottom:0; }
+    #historyList{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .hist-item{ margin-bottom:0; }
+  }
+
+  /* Large desktop: ~1400px and up — a bit more breathing room, not endless stretching */
+  @media (min-width: 1400px){
+    .phone{ max-width:1040px; }
+    .screen{ max-width:760px; }
+  }
 </style>
 </head>
 <body>
+<div id="splashScreen">
+  <div class="splash-mark">
+    <img src="logo.png" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿'}))">
+  </div>
+  <div class="splash-name">Uzhavan AI</div>
+  <div class="splash-sub" id="splashSub">Loading…</div>
+</div>
 <div class="phone">
 
   <div class="topbar">
@@ -490,10 +585,10 @@ const RETAILERS = [
 ];
 
 const DISTRICTS = [
-  {name:"Madurai", sev:"high", n:{en:"32 scans · Chilli anthracnose trending", hi:"32 स्कैन · मिर्च एन्थ्रेक्नोज़ बढ़ रहा है", ta:"32 ஸ்கேன்கள் · மிளகாய் ஆந்த்ராக்நோஸ் அதிகரிக்கிறது"}},
-  {name:"Tirunelveli", sev:"med", n:{en:"21 scans · Rice blast rising", hi:"21 स्कैन · धान ब्लास्ट बढ़ रहा है", ta:"21 ஸ்கேன்கள் · நெல் வெடிப்பு அதிகரிக்கிறது"}},
-  {name:"Theni", sev:"med", n:{en:"15 scans · Banana Panama wilt reported", hi:"15 स्कैन · केला पनामा विल्ट की सूचना", ta:"15 ஸ்கேன்கள் · வாழை பனாமா வாட்டம் தெரிவிக்கப்பட்டது"}},
-  {name:"Thoothukudi", sev:"low", n:{en:"9 scans · Mostly healthy", hi:"9 स्कैन · अधिकतर स्वस्थ", ta:"9 ஸ்கேன்கள் · பெரும்பாலும் ஆரோக்கியமானது"}}
+  {name:{en:"Madurai", hi:"मदुरै", ta:"மதுரை"}, sev:"high", n:{en:"32 scans · Chilli anthracnose trending", hi:"32 स्कैन · मिर्च एन्थ्रेक्नोज़ बढ़ रहा है", ta:"32 ஸ்கேன்கள் · மிளகாய் ஆந்த்ராக்நோஸ் அதிகரிக்கிறது"}},
+  {name:{en:"Tirunelveli", hi:"तिरुनेलवेली", ta:"திருநெல்வேலி"}, sev:"med", n:{en:"21 scans · Rice blast rising", hi:"21 स्कैन · धान ब्लास्ट बढ़ रहा है", ta:"21 ஸ்கேன்கள் · நெல் வெடிப்பு அதிகரிக்கிறது"}},
+  {name:{en:"Theni", hi:"थेनी", ta:"தேனி"}, sev:"med", n:{en:"15 scans · Banana Panama wilt reported", hi:"15 स्कैन · केला पनामा विल्ट की सूचना", ta:"15 ஸ்கேன்கள் · வாழை பனாமா வாட்டம் தெரிவிக்கப்பட்டது"}},
+  {name:{en:"Thoothukudi", hi:"तूतीकोरिन", ta:"தூத்துக்குடி"}, sev:"low", n:{en:"9 scans · Mostly healthy", hi:"9 स्कैन · अधिकतर स्वस्थ", ta:"9 ஸ்கேன்கள் · பெரும்பாலும் ஆரோக்கியமானது"}}
 ];
 const SEV_COLOR = {high:"#B0402F", med:"#E3A008", low:"#3C6B4A"};
 
@@ -769,7 +864,7 @@ function renderDistricts(){
   el.innerHTML = DISTRICTS.map(d=>`
     <div class="district-card">
       <div>
-        <div class="name">${d.name}</div>
+        <div class="name">${d.name[currentLang]}</div>
         <div class="n">${d.n[currentLang]}</div>
       </div>
       <div class="sev" style="background:${SEV_COLOR[d.sev]}"></div>
@@ -781,6 +876,17 @@ function renderDistricts(){
 setLang('en');
 renderDistricts();
 renderHistory();
+
+// Let both breaths of the logo animation finish (2 x 2.6s = 5.2s) before
+// fading the splash screen out, so the loading effect is actually seen
+// rather than skipped past.
+setTimeout(()=>{
+  const splash = document.getElementById('splashScreen');
+  if(splash){
+    splash.classList.add('hide');
+    setTimeout(()=> splash.remove(), 550); // remove from DOM after the fade-out transition finishes
+  }
+}, 5200);
 </script>
 </body>
 </html>

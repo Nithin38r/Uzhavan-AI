@@ -54,6 +54,12 @@
   }
   .brand .name{font-family:var(--font-display); font-weight:700; font-size:23px; letter-spacing:.3px;}
   .topbar-controls{display:flex; align-items:center; gap:10px;}
+
+  @media (max-width: 380px){
+    .topbar-controls{ gap:6px; }
+    .brand .name{ font-size:19px; }
+    .offline-toggle{ padding:5px 7px; }
+  }
   .lang-select{
     background:rgba(255,255,255,.12); color:var(--paper); border:1px solid rgba(255,255,255,.25);
     border-radius:8px; padding:5px 8px; font-size:12px; font-family:var(--font-body); font-weight:600;
@@ -65,6 +71,50 @@
   }
   .dot{width:8px; height:8px; border-radius:50%; background:#7CD98A; transition:.2s;}
   .offline .dot{background:#E38C4E;}
+
+  /* ---- account icon + login dropdown ---- */
+  .account-wrap{ position:relative; }
+  .account-icon{
+    width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.3); color:var(--paper); font-size:16px;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    perspective:400px; /* needed for the 3D flip effect below */
+    transition:background .2s;
+  }
+  .account-icon:hover{ background:rgba(255,255,255,.22); }
+  .account-icon.flip{ animation:accountFlip .5s ease; }
+  @keyframes accountFlip{
+    0%   { transform:rotateY(0deg); }
+    100% { transform:rotateY(360deg); }
+  }
+  .account-dropdown{
+    position:absolute; top:calc(100% + 10px); right:0; width:220px;
+    background:var(--paper); border:1px solid var(--line); border-radius:14px;
+    box-shadow:0 12px 32px rgba(0,0,0,.18); padding:14px;
+    opacity:0; visibility:hidden; transform:translateY(-6px);
+    transition:opacity .18s ease, transform .18s ease, visibility .18s;
+    z-index:50;
+  }
+  /* shown either by tapping/clicking the icon (JS adds .open — works on
+     mobile too, since touch doesn't reliably support :hover) or by
+     hovering on a desktop mouse pointer, as a bonus for desktop users */
+  .account-dropdown.open,
+  .account-wrap:hover .account-dropdown{
+    opacity:1; visibility:visible; transform:translateY(0);
+  }
+  .account-dropdown-header{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .account-avatar{
+    width:38px; height:38px; border-radius:50%; background:var(--leaf-soft);
+    display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;
+  }
+  .account-name{ font-size:13.5px; font-weight:700; color:var(--ink); }
+  .account-sub{ font-size:11.5px; color:var(--ink-soft); }
+  .account-dropdown-btn{
+    width:100%; text-align:left; padding:9px 10px; border-radius:9px; border:1px solid var(--line);
+    background:var(--cream); color:var(--ink); font-family:var(--font-body); font-weight:600; font-size:13px;
+    cursor:pointer; margin-top:6px;
+  }
+  .account-dropdown-btn.primary{ background:var(--leaf); color:#fff; border-color:var(--leaf); }
 
   /* ---- screens ---- */
   .screens{flex:1; overflow-y:auto; padding-bottom:78px;}
@@ -306,6 +356,26 @@
         <option value="hi">हिं</option>
         <option value="ta">தமிழ்</option>
       </select>
+
+      <!-- Account icon: click flips it and toggles the login dropdown below.
+           Works the same way on mobile (tap) and desktop (click) — no
+           hover-only behavior, since hover doesn't reliably exist on
+           touchscreens. This is a visual placeholder only; there's no
+           real authentication wired up behind it. -->
+      <div class="account-wrap" id="accountWrap">
+        <button class="account-icon" id="accountIcon" onclick="toggleAccountMenu()" aria-label="Account">👤</button>
+        <div class="account-dropdown" id="accountDropdown">
+          <div class="account-dropdown-header">
+            <div class="account-avatar">👤</div>
+            <div>
+              <div class="account-name">Guest</div>
+              <div class="account-sub">Not signed in</div>
+            </div>
+          </div>
+          <button class="account-dropdown-btn primary">Log In</button>
+          <button class="account-dropdown-btn">Sign Up</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -741,6 +811,30 @@ function toggleOffline(){
   box.classList.toggle('offline', isOffline);
   document.getElementById('offlineLabel').textContent = isOffline ? 'Offline' : 'Online';
 }
+
+/* ---------------- account icon: flip + login dropdown ---------------- */
+// Works the same on mobile (tap) as on desktop (click) — deliberately
+// NOT hover-only, since touchscreens don't reliably support :hover.
+// This is a visual placeholder — no real login/auth is wired up.
+function toggleAccountMenu(event){
+  if(event) event.stopPropagation(); // don't let the outside-click handler below immediately close it again
+  const icon = document.getElementById('accountIcon');
+  const dropdown = document.getElementById('accountDropdown');
+
+  icon.classList.remove('flip');
+  void icon.offsetWidth; // restart the flip animation even on repeated clicks
+  icon.classList.add('flip');
+
+  dropdown.classList.toggle('open');
+}
+
+// Tapping/clicking anywhere outside the account menu closes it
+document.addEventListener('click', (e)=>{
+  const wrap = document.getElementById('accountWrap');
+  if(wrap && !wrap.contains(e.target)){
+    document.getElementById('accountDropdown').classList.remove('open');
+  }
+});
 
 /* ---------------- nav ---------------- */
 function showScreen(name){
